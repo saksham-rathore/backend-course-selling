@@ -3,32 +3,9 @@ import express, { type Express, type Request, type Response } from 'express';
 const app: Express = express();
 const port = 3000;
 
-app.post('/user/signup', (req: Request, res: Response) => {
-    res.json({
-        message: "signup endpoint"
-    });
-});
+app.use("/signUp", userRouter)
+app.use("/course/preview", courses)
 
-
-app.put('/user/signup', (req: Request, res: Response) => {
-    res.json({
-        message: "update"
-    });
-});
-
-
-app.get('/user/purchases', (req: Request, res: Response) => {
-    res.json({
-        message: "get email"
-    });
-});
-
-
-app.get('/courses', (req: Request, res: Response) => {
-    res.json({
-        message: "delete endpoints"
-    });
-});
 
 app.listen(port, () => {
     console.log(`your app is listening on port ${port}`);
