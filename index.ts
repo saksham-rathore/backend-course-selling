@@ -6,7 +6,7 @@ const app: Express = express();
 const port = 3000;
 
 app.use("/signUp", userRouter);
-app.use("/course/preview", courses);
+app.use("/course", courses);
 
 app.listen(port, () => {
   console.log(`your app is listening on port ${port}`);

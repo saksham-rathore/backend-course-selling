@@ -1,6 +1,6 @@
 import { type Request, type Response } from "express";
-const { Router } = require("express");
-const courses: typeof Router = Router();
+import { Router } from "express";
+const courses = Router();
 
 courses.get("/user/purchases", (req: Request, res: Response) => {
   res.json({
@@ -8,20 +8,17 @@ courses.get("/user/purchases", (req: Request, res: Response) => {
   });
 });
 
-
-courses.get("/courses", (req: Request, res: Response) => {
-  res.json({  
-    message: "delete endpoints",
-  });
-});
-
-
 courses.get("/courses", (req: Request, res: Response) => {
   res.json({
     message: "delete endpoints",
   });
 });
 
+courses.get("/courses", (req: Request, res: Response) => {
+  res.json({
+    message: "delete endpoints",
+  });
+});
 
 courses.get("/courses", (req: Request, res: Response) => {
   res.json({
