@@ -30,6 +30,4 @@ userRouter.put("/user/signup", (req: Request, res: Response) => {
   });
 });
 
-module.exports = {
-  userRouter: userRouter,
-};
+export default userRouter;

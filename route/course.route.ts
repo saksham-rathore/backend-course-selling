@@ -10,7 +10,7 @@ courses.get("/user/purchases", (req: Request, res: Response) => {
 
 
 courses.get("/courses", (req: Request, res: Response) => {
-  res.json({
+  res.json({  
     message: "delete endpoints",
   });
 });
@@ -29,6 +29,4 @@ courses.get("/courses", (req: Request, res: Response) => {
   });
 });
 
-module.exports = {
-  courses: courses,
-};
+export default courses;
