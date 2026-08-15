@@ -1,12 +1,10 @@
 {
   "compilerOptions": {
-    "target": "esnext",
-    "module": "nodenext",
-    "rewriteRelativeImportExtensions": true,
-    "erasableSyntaxOnly": true,
-    "verbatimModuleSyntax": true,
-    "noEmit": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "target": "ES2023",
     "strict": true,
-    "skipLibCheck": true
+    "esModuleInterop": true,
+    "ignoreDeprecations": "6.0"
   }
 }
