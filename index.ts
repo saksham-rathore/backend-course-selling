@@ -1,12 +1,14 @@
 import express, { type Express, type Request, type Response } from "express";
-import userRouter from "./route/user.route.js";
-import courses from "./route/course.route.js";
+
 
 const app: Express = express();
 const port = 3000;
 
-app.use("/signUp", userRouter);
-app.use("/course", courses);
+// route imports
+import { registerUser } from "./controller/user.controller.js";
+
+// routes decleration
+app.use("/api/registerUser", registerUser as any)
 
 app.listen(port, () => {
   console.log(`your app is listening on port ${port}`);
