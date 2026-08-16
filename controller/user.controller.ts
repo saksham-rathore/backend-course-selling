@@ -28,21 +28,14 @@ type signInBody = {
 };
 
 type logOutBody = {
-  email: string,
-  password: string
-}
+  email: string;
+  password: string;
+};
 
 export const registerUser = async (
   req: Request<{}, {}, RegisterUserBody>,
   res: Response,
 ): Promise<void> => {
-  // get user details from frontend
-  // validation - not empty
-  // check if user already exists: username, email
-  // create user object - create entry in db
-  // remove password and refresh token field from response
-  // check for user creation
-  // return res
 
   const { fullName, userName, email, password } = req.body;
 
@@ -73,16 +66,7 @@ export const registerUser = async (
     },
   });
 
-  const createdUser = await prisma.user.findUnique({
-    where: { id: User.id },
-    select: {
-      fullName: true,
-      userName: true,
-      email: true,
-    },
-  });
-
-  if (!createdUser) {
+  if (!User) {
     res
       .status(409)
       .json({ message: "Something went wrong while registering the user" });
@@ -91,6 +75,11 @@ export const registerUser = async (
 
   res.status(201).json({
     message: "User registered successfully",
+    user: {
+      id: User.id,
+      email: User.email,
+      userName: User.name,
+    },
   });
 };
 
@@ -103,7 +92,7 @@ export const signIn = async (
   //find the user
   //password check
   //access and referesh token
-  //send cookie
+  // send cookie
   const { email, password, userName } = req.body;
 
   if (!email && !userName) {
@@ -150,9 +139,9 @@ export const signIn = async (
   });
 };
 
-export const logOut = async (
-  req: Request<{}, {}, logOutBody>,
-  res: Response,
-): Promise<void> => {
-  await 
-};
+// export const logOut = async (
+//   req: Request<{}, {}, logOutBody>,
+//   res: Response,
+// ): Promise<void> => {
+//   await
+// };

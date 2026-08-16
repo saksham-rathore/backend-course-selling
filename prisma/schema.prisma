@@ -8,8 +8,9 @@ import { PrismaModule } from '../prisma/prisma.module';
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider        = "prisma-client"
+  output          = "../generated/prisma"
+  previewFeatures = ["omitApi"]
 }
 
 datasource db {
@@ -17,37 +18,15 @@ datasource db {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
-  email     String    @unique
-  username  String?
-  courses   Course[]
-  session   Session[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-}
-
-model courses {
-  id        Int     @id @default(autoincrement())
-  title     String
-  content   String?
-  published Boolean @default(false)
-  user      User    @relation(fields: [authorId], references: [id])
-  userId    Int
-}
-
-@Module({
-  controllers: [UsersController],
-  providers: [UsersService],
-  imports: [PrismaModule],
-  exports: [UsersService],
-})
-export class UsersModule {}
-
-model Session {
-  id           Int      @id @default(autoincrement())
-  refreshToken String   @unique
-  userId       Int
-  expiresAt    DateTime
-  user         user     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt    DateTime @default(now())
+  id           Int       @id @default(autoincrement())
+  email        String    @unique
+  userName     String    @unique
+  fullName     String
+  password     String
+  courses      Course[]
+  session      Session[]
+  accessToken  String?
+  refreshToken String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 }
