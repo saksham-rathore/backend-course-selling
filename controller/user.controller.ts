@@ -57,6 +57,9 @@ export const registerUser = async (
     return;
   }
 
+  // The password field is excluded in all queries, including this one
+  const user = await prisma.user.findUnique({ where: { id: 1 } });
+
   const saltRounds = 10;
   const plainPassword = "user_secret";
   const hashedPassword = await bcrypt.hash(plainPassword, saltRounds);
@@ -91,12 +94,6 @@ export const signIn = async (
   req: Request<{}, {}, signInBody>,
   res: Response,
 ): Promise<void> => {
-  // req body -> data
-  // username or email
-  //find the user
-  //password check
-  //access and referesh token
-  // send cookie
   const { email, password, userName } = req.body;
 
   if (!email && !userName) {
@@ -143,9 +140,3 @@ export const signIn = async (
   });
 };
 
-// export const logOut = async (
-//   req: Request<{}, {}, logOutBody>,
-//   res: Response,
-// ): Promise<void> => {
-//   await
-// };
