@@ -1,3 +1,7 @@
+import { Module } from '@nestjs/common';
+import { UsersService } from './users.service';
+import { UsersController } from './users.controller';
+import { PrismaModule } from '../prisma/prisma.module';
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
@@ -13,10 +17,13 @@ datasource db {
 }
 
 model User {
-  id       Int      @id @default(autoincrement())
-  email    String   @unique
-  username String?
-  courses  Course[]
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  username  String?
+  courses   Course[]
+  session   Session[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model courses {
@@ -26,4 +33,21 @@ model courses {
   published Boolean @default(false)
   user      User    @relation(fields: [authorId], references: [id])
   userId    Int
+}
+
+@Module({
+  controllers: [UsersController],
+  providers: [UsersService],
+  imports: [PrismaModule],
+  exports: [UsersService],
+})
+export class UsersModule {}
+
+model Session {
+  id           Int      @id @default(autoincrement())
+  refreshToken String   @unique
+  userId       Int
+  expiresAt    DateTime
+  user         user     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
 }

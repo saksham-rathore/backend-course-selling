@@ -20,6 +20,18 @@ type RegisterUserBody = {
   User: string;
 };
 
+type signInBody = {
+  email: string;
+  password: string;
+  User: string;
+  userName: string;
+};
+
+type logOutBody = {
+  email: string,
+  password: string
+}
+
 export const registerUser = async (
   req: Request<{}, {}, RegisterUserBody>,
   res: Response,
@@ -27,8 +39,6 @@ export const registerUser = async (
   // get user details from frontend
   // validation - not empty
   // check if user already exists: username, email
-  // check for images, check for avatar
-  // upload them to cloudinary, avatar
   // create user object - create entry in db
   // remove password and refresh token field from response
   // check for user creation
@@ -82,4 +92,67 @@ export const registerUser = async (
   res.status(201).json({
     message: "User registered successfully",
   });
+};
+
+export const signIn = async (
+  req: Request<{}, {}, signInBody>,
+  res: Response,
+): Promise<void> => {
+  // req body -> data
+  // username or email
+  //find the user
+  //password check
+  //access and referesh token
+  //send cookie
+  const { email, password, userName } = req.body;
+
+  if (!email && !userName) {
+    res.status(400).json({ message: "Email or username is required" });
+    return;
+  }
+
+  if (!password) {
+    res.status(400).json({ message: "Password is required" });
+    return;
+  }
+
+  const user = await prisma.user.findFirst({
+    where: {
+      OR: [{ userName }, { email }],
+    },
+    select: {
+      id: true,
+      email: true,
+      password: true,
+      userName: true,
+    },
+  });
+
+  if (!user) {
+    res.status(401).json({ message: "Invalid user credentials" });
+    return;
+  }
+
+  const isPasswordValid = user.password === password;
+
+  if (!isPasswordValid) {
+    res.status(401).json({ message: "Invalid user credentials" });
+    return;
+  }
+
+  res.status(200).json({
+    message: "User signed in successfully",
+    user: {
+      id: user.id,
+      email: user.email,
+      userName: user.userName,
+    },
+  });
+};
+
+export const logOut = async (
+  req: Request<{}, {}, logOutBody>,
+  res: Response,
+): Promise<void> => {
+  await 
 };
