@@ -3,6 +3,7 @@ import userRouter from "../route/user.route";
 import { PrismaClient } from "../generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import "dotenv/config";
+import bcrypt from "bcrypt";
 
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL!,
@@ -36,7 +37,6 @@ export const registerUser = async (
   req: Request<{}, {}, RegisterUserBody>,
   res: Response,
 ): Promise<void> => {
-
   const { fullName, userName, email, password } = req.body;
 
   if (
@@ -57,11 +57,15 @@ export const registerUser = async (
     return;
   }
 
+  const saltRounds = 10;
+  const plainPassword = "user_secret";
+  const hashedPassword = await bcrypt.hash(plainPassword, saltRounds);
+
   const User = await prisma.user.create({
     data: {
       userName: userName.toLowerCase(),
       email,
-      password,
+      password: hashedPassword,
       fullName,
     },
   });
@@ -78,7 +82,7 @@ export const registerUser = async (
     user: {
       id: User.id,
       email: User.email,
-      userName: User.name,
+      userName: User.userName,
     },
   });
 };
