@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import userRouter from "../route/user.route";
+import userRouter from "../route/route";
 import { PrismaClient } from "../generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import "dotenv/config";
@@ -57,12 +57,7 @@ export const registerUser = async (
     return;
   }
 
-  // The password field is excluded in all queries, including this one
-  const user = await prisma.user.findUnique({ where: { id: 1 } });
-
-  const saltRounds = 10;
-  const plainPassword = "user_secret";
-  const hashedPassword = await bcrypt.hash(plainPassword, saltRounds);
+  const hashedPassword = await bcrypt.hash(password, 10);
 
   const User = await prisma.user.create({
     data: {
@@ -122,8 +117,11 @@ export const signIn = async (
     res.status(401).json({ message: "Invalid user credentials" });
     return;
   }
+  console.log("Hash exists:", !!user.password);
+  console.log("Hash format:", user.password.startsWith("$2"));
 
-  const isPasswordValid = user.password === password;
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+  console.log("Password valid:", isPasswordValid);
 
   if (!isPasswordValid) {
     res.status(401).json({ message: "Invalid user credentials" });
@@ -140,3 +138,9 @@ export const signIn = async (
   });
 };
 
+export const signOut = async (
+  req: Request<{}, {}, signInBody>,
+  res: Response,
+): Promise<void> => {
+  
+}
