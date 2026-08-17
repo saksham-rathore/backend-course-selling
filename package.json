@@ -26,6 +26,7 @@
     "bcrypt": "^6.0.0",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "json": "^11.0.0",
     "jsonwebtoken": "^9.0.3",
     "migrate": "^2.1.0",
     "mongoose": "^9.9.2",
@@ -35,6 +36,7 @@
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^26.2.0",
     "@types/nodemailer": "^8.0.1",
     "@types/pg": "^8.21.0",
