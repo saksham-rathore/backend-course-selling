@@ -14,13 +14,23 @@ datasource db {
 }
 
 model User {
-  id           Int       @id @default(autoincrement())
-  email        String    @unique
-  userName     String    @unique
-  fullName     String
-  password     String
-  accessToken  String?
-  refreshToken String?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  id                Int                 @id @default(autoincrement())
+  email             String              @unique
+  userName          String              @unique
+  fullName          String
+  password          String
+  accessToken       String?
+  refreshToken      String?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  emailVerifiedAt   DateTime            @updatedAt
+}
+
+model EmailVerification {
+  id              Int      @id @default(autoincrement())
+  userName        String
+  createdAt       DateTime @default(now())
+  tokenHash       ExpiresAt
+  userdAt         DateTime?
+  ExpiresAt       DateTime
 }

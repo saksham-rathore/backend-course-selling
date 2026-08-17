@@ -4,6 +4,7 @@ import { PrismaClient } from "../generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import "dotenv/config";
 import bcrypt from "bcrypt";
+import nodemailer from "nodemailer";
 
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL!,
@@ -75,6 +76,39 @@ export const registerUser = async (
     return;
   }
 
+  const transporter = nodemailer.createTransport({
+    service: "gmail", // Shortcut for Gmail's SMTP settings - see Well-Known Services
+    auth: {
+      type: "OAuth2",
+      user: process.env.EMAIL_USER,
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      refreshToken: process.env.GOOGLE_REFRESH_TOKEN,
+    },
+  });
+
+  const sendVerificationEmail = async (
+    email: string,
+    verificationUrl: string,
+  ) => {
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Verify your email",
+      html: `
+      <h2>Verify your email</h2>
+
+      <p>Click the button below to verify your email address.</p>
+
+      <a href="${verificationUrl}">
+        Verify Email
+      </a>
+
+      <p>This link will expire soon.</p>
+      `,
+    });
+  };
+
   res.status(201).json({
     message: "User registered successfully",
     user: {
@@ -141,6 +175,4 @@ export const signIn = async (
 export const signOut = async (
   req: Request<{}, {}, signInBody>,
   res: Response,
-): Promise<void> => {
-  
-}
+): Promise<void> => {};

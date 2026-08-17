@@ -29,12 +29,14 @@
     "jsonwebtoken": "^9.0.3",
     "migrate": "^2.1.0",
     "mongoose": "^9.9.2",
+    "nodemailer": "^9.0.5",
     "pg": "^8.23.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.6",
     "@types/node": "^26.2.0",
+    "@types/nodemailer": "^8.0.1",
     "@types/pg": "^8.21.0",
     "prisma": "^7.9.1",
     "tsx": "^4.23.12",
