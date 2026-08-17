@@ -5,6 +5,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import "dotenv/config";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import cookieParser from "cookie-parser";
 
 function generateAccessToken(user: { id: number; email: string }) {
   return jwt.sign(
@@ -152,10 +153,41 @@ export const signIn = async (
     return;
   }
 
-  const accessToken = generateAccessToken(user)
+  const accessToken = generateAccessToken(user);
+
+  // generate refresh token
+  const refreshToken = generateRefreshToken(user);
+
+  // hash refresh token before storing
+  const tokenHash = await bcrypt.hash(refreshToken, 10);
+
+  // calculate expiresAt (1 day from now, matching "1d" duration)
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + 1);
+
+  const refreshTokenRecord = await prisma.refreshToken.create({
+    data: {
+      tokenHash,
+      userId: user.id,
+      expiresAt,
+    },
+  });
+  res
+    .cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: true,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      sameSite: "strict"
+    })
+    .status(200)
+    .json({
+      message: "User signedIn successfully"
+    })
+
 
   res.status(200).json({
     message: "User signed in successfully",
+    accessToken,
     user: {
       id: user.id,
       email: user.email,
@@ -167,4 +199,4 @@ export const signIn = async (
 export const signOut = async (
   req: Request<{}, {}, signInBody>,
   res: Response,
-): Promise<void> => {};
+): Promise<void> => { };

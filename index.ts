@@ -1,9 +1,11 @@
 import express, { type Express, type Request, type Response } from "express";
+import cookieParser from "cookie-parser";
 
 const app: Express = express();
 const port = 3000;
 
 app.use(express.json());
+app.use(cookieParser());
 
 import { registerUser, signIn } from "./controller/user.controller.js";
 

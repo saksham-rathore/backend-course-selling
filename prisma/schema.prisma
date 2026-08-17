@@ -14,23 +14,25 @@ datasource db {
 }
 
 model User {
-  id                Int                 @id @default(autoincrement())
-  email             String              @unique
-  userName          String              @unique
-  fullName          String
-  password          String
-  accessToken       String?
-  refreshToken      String?
-  createdAt         DateTime            @default(now())
-  updatedAt         DateTime            @updatedAt
-  emailVerifiedAt   DateTime            @updatedAt
+  id            Int            @id @default(autoincrement())
+  email         String         @unique
+  userName      String         @unique
+  fullName      String
+  password      String
+  accessToken   String?
+  refreshToken  String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  refreshTokens RefreshToken[]
 }
 
-model EmailVerification {
-  id              Int      @id @default(autoincrement())
-  userName        String
-  createdAt       DateTime @default(now())
-  tokenHash       ExpiresAt
-  userdAt         DateTime?
-  ExpiresAt       DateTime
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  tokenHash String   @unique
+  expiresAt DateTime
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
