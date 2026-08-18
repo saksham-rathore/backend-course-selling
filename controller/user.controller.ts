@@ -1,4 +1,4 @@
-import { Router, Request, Response } from "express";
+import { Router, Request, Response, CookieOptions } from "express";
 import userRouter from "../route/route";
 import { prisma } from "../lib/prisma";
 import "dotenv/config";
@@ -187,9 +187,25 @@ export const signIn = async (
   });
 };
 
-export const signOut = async (
-  req: Request<{}, {}, signInBody>,
-  res: Response,
-): Promise<void> => {
-  
-};
+export const signOut = async (req: Request, res: Response) => {
+  // Delete all refresh tokens belonging to this user
+  await prisma.refreshToken.deleteMany({
+    where: {
+      userId: req.user.id
+    }
+  });
+
+  const options: CookieOptions = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict"
+  };
+
+  return res
+    .status(200)
+    .clearCookie("accessToken", options)
+    .clearCookie("refreshToken", options)
+    .json(
+      { message: "user signOut successfully" }
+    );
+}
