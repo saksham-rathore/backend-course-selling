@@ -1,7 +1,6 @@
 import { Router, Request, Response } from "express";
 import userRouter from "../route/route";
-import { PrismaClient } from "../generated/prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
+import { prisma } from "../lib/prisma";
 import "dotenv/config";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -32,14 +31,6 @@ function generateRefreshToken(user: { id: number; email: string }) {
     },
   );
 }
-
-const adapter = new PrismaPg({
-  connectionString: process.env.DATABASE_URL!,
-});
-
-const prisma = new PrismaClient({
-  adapter,
-});
 
 type RegisterUserBody = {
   fullName: string;
@@ -199,4 +190,6 @@ export const signIn = async (
 export const signOut = async (
   req: Request<{}, {}, signInBody>,
   res: Response,
-): Promise<void> => { };
+): Promise<void> => {
+  
+};
