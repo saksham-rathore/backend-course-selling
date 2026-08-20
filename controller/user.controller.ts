@@ -144,6 +144,7 @@ export const signIn = async (
     return;
   }
 
+  // generate access token
   const accessToken = generateAccessToken(user);
 
   // generate refresh token
@@ -167,24 +168,25 @@ export const signIn = async (
     .cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: true,
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge: 1 * 24 * 60 * 60 * 1000, // 1 day
+      sameSite: "strict"
+    })
+    .cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: true,
+      maxAge: 15 * 60 * 1000, // 15 minutes
       sameSite: "strict"
     })
     .status(200)
     .json({
-      message: "User signedIn successfully"
-    })
-
-
-  res.status(200).json({
-    message: "User signed in successfully",
-    accessToken,
-    user: {
-      id: user.id,
-      email: user.email,
-      userName: user.userName,
-    },
-  });
+      message: "User signed in successfully",
+      accessToken,
+      user: {
+        id: user.id,
+        email: user.email,
+        userName: user.userName,
+      },
+    });
 };
 
 export const signOut = async (req: Request, res: Response) => {
@@ -208,4 +210,8 @@ export const signOut = async (req: Request, res: Response) => {
     .json(
       { message: "user signOut successfully" }
     );
+}
+
+export const RefreshAccessToken = async (req: Request, res: Response) => {
+  
 }
