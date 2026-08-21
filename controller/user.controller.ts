@@ -212,6 +212,92 @@ export const signOut = async (req: Request, res: Response) => {
     );
 }
 
-export const RefreshAccessToken = async (req: Request, res: Response) => {
-  
-}
+export const RefreshAccessToken = async (req: Request, res: Response): Promise<void> => {
+  const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken;
+
+  if (!incomingRefreshToken) {
+    res.status(401).json({ message: "Unauthorized request" });
+    return;
+  }
+
+  try {
+    const decodedToken = jwt.verify(
+      incomingRefreshToken,
+      process.env.REFRESH_TOKEN_SECRET!
+    ) as { id: number; email: string };
+
+    const user = await prisma.user.findUnique({
+      where: {
+        id: decodedToken.id,
+      },
+      include: {
+        refreshTokens: true,
+      },
+    });
+
+    if (!user) {
+      res.status(401).json({ message: "Invalid Refresh token" });
+      return;
+    }
+
+    // Compare incoming refresh token with the user's stored refresh tokens
+    let matchedTokenRecordId: number | null = null;
+    for (const tokenRecord of user.refreshTokens) {
+      if (tokenRecord.expiresAt > new Date()) {
+        const isMatch = await bcrypt.compare(incomingRefreshToken, tokenRecord.tokenHash);
+        if (isMatch) {
+          matchedTokenRecordId = tokenRecord.id;
+          break;
+        }
+      }
+    }
+
+    if (!matchedTokenRecordId) {
+      res.status(401).json({ message: "Invalid or expired Refresh token" });
+      return;
+    }
+
+    // Refresh Token Rotation (RTR): delete the used refresh token from the database
+    await prisma.refreshToken.delete({
+      where: { id: matchedTokenRecordId }
+    });
+
+    // Generate new access and refresh tokens
+    const accessToken = generateAccessToken(user);
+    const newRefreshToken = generateRefreshToken(user);
+
+    // Save new refresh token hash to database
+    const tokenHash = await bcrypt.hash(newRefreshToken, 10);
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 1);
+
+    await prisma.refreshToken.create({
+      data: {
+        tokenHash,
+        userId: user.id,
+        expiresAt,
+      },
+    });
+
+    res
+      .cookie("refreshToken", newRefreshToken, {
+        httpOnly: true,
+        secure: true,
+        maxAge: 1 * 24 * 60 * 60 * 1000, // 1 day
+        sameSite: "strict"
+      })
+      .cookie("accessToken", accessToken, {
+        httpOnly: true,
+        secure: true,
+        maxAge: 15 * 60 * 1000, // 15 minutes
+        sameSite: "strict"
+      })
+      .status(200)
+      .json({
+        message: "Access token refreshed successfully",
+        accessToken,
+      });
+  } catch (error) {
+    res.status(401).json({ message: "Invalid or expired Refresh token" });
+  }
+};
